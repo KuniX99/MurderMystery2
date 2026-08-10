@@ -1,55 +1,29 @@
-local function LoadScripts()
-    print("[LOADER] Fetching first script...")
-    
-    local success1, result1 = pcall(function()
-        return game:HttpGet("https://pastefy.app/Md06iIua/raw")
-    end)
-    
-    if not success1 then
-        print("[LOADER] Failed to load first script: " .. tostring(result1))
-        return
-    end
-    
-    print("[LOADER] Executing first script...")
-    
-    local func1, err1 = loadstring(result1)
-    
-    if not func1 then
-        print("[LOADER] Failed to compile first script: " .. tostring(err1))
-        return
-    end
-    
-    pcall(func1)
-    print("[LOADER] First script executed. Waiting 1 second...")
-    
-    task.wait(1)
-    
-    print("[LOADER] Fetching second script...")
-    
-    local success2, result2 = pcall(function()
-        return game:HttpGet("https://pastefy.app/S7lMsuC0/raw")
-    end)
-    
-    if not success2 then
-        print("[LOADER] Failed to load second script: " .. tostring(result2))
-        return
-    end
-    
-    print("[LOADER] Executing second script...")
-    
-    local func2, err2 = loadstring(result2)
-    
-    if not func2 then
-        print("[LOADER] Failed to compile second script: " .. tostring(err2))
-        return
-    end
-    
-    pcall(func2)
-    print("[LOADER] Both scripts loaded and executed successfully!")
-end
+local supportedGames = {
+    [920587237] = {name = "Adopt Me", url = "https://raw.githubusercontent.com/Wonik99/library-hub/refs/heads/main/adoptme"},
+    [109983668079237] = {name = "Steal a Brainrot", url = "https://raw.githubusercontent.com/Wonik99/library-hub/refs/heads/main/stealabrainrot"},
+    [142823291] = {name = "Murder Mystery 2", url = "https://raw.githubusercontent.com/Wonik99/library-hub/refs/heads/main/murdermystery2"},
+    [97598239454123] = {name = "Grow a Garden 2", url = "https://raw.githubusercontent.com/Wonik99/library-hub/refs/heads/main/growagarden2"}
+}
 
-local success, err = pcall(LoadScripts)
+local mainHubUrl = "https://raw.githubusercontent.com/Wonik99/library-hub/refs/heads/main/mainhub"
 
-if not success then
-    print("[LOADER] Fatal error: " .. tostring(err))
+local placeId = game.PlaceId
+local target = supportedGames[placeId]
+
+local urlToLoad = target and target.url or mainHubUrl
+
+local success, result = pcall(function()
+    return game:HttpGet(urlToLoad)
+end)
+
+if success then
+    local loadSuccess, err = pcall(function()
+        loadstring(result)()
+    end)
+
+    if not loadSuccess then
+        warn("[Hub] Failed to execute script: " .. tostring(err))
+    end
+else
+    warn("[Hub] Failed to fetch script: " .. tostring(result))
 end
